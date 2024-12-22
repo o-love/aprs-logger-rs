@@ -1,21 +1,24 @@
-use std::io::Error;
+use tokio::io::BufReader;
 use aprs_logger::aprsis::cnx::start_default_aprs_is_stream;
 use aprs_logger::aprsis::processor::parse_aprs_tnc2_line;
 use aprs_logger::stream_processor::{process_stream};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     println!("Hello, world!");
     
-    let mut tcp_stream = start_default_aprs_is_stream().unwrap();
+    let tcp_stream = start_default_aprs_is_stream().await.unwrap();
+    let tcp_stream = BufReader::new(tcp_stream);
     
     println!("tcp stream started");
+   
     
 
     let input_processor = |line: &[u8]| {
         match parse_aprs_tnc2_line(line) {
             Ok(packet) => {Some(packet)}
             Err(err) => {
-                eprint!("Invalid utf-8 line: ");
+                eprint!("Invalid line: ");
                 
                 for c in line {
                     eprint!("{}", *c as char);

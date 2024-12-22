@@ -1,13 +1,12 @@
-use std::io::Write;
+use std::io::{BufReader, Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
+use std::ptr::eq;
 
 pub fn start_aprs_is_stream<A: ToSocketAddrs>(addr: A, call_sign: &str, passwd: &str) -> std::io::Result<TcpStream> {
     let mut aprsis_stream = TcpStream::connect(addr)?;
-    
-    let login = format!("user {call_sign} pass {passwd} vers t1 1.2 TCP");
-    
-    aprsis_stream.write_all(login.as_bytes())?;
-    
+
+    initialize_aprs_is_stream(&mut aprsis_stream, call_sign, passwd)?;
+
     Ok(aprsis_stream)
 }
 
@@ -19,3 +18,24 @@ pub fn start_default_aprs_is_stream() -> std::io::Result<TcpStream> {
     )
 }
 
+fn initialize_aprs_is_stream(tcp_stream: &mut TcpStream, call_sign: &str, passwd: &str) -> std::io::Result<()> {
+    let login = format!("user {call_sign} pass {passwd} vers t1 1.2 TCP\r\n");
+
+    let mut count_nl = 1;
+    while count_nl > 0 {
+        let mut buf: [u8; 1] = [0x00; 1];
+
+        tcp_stream.read_exact(&mut buf)?;
+
+        print!("{}", buf[0] as char);
+
+        if buf[0] == b'\n' {
+            count_nl -= 1;
+        }
+    }
+
+    tcp_stream.write_all(login.as_bytes())?;
+    tcp_stream.flush()?;
+
+    Ok(())
+}

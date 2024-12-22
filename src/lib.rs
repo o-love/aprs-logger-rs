@@ -1,5 +1,5 @@
-mod aprsis;
-mod stream_processor;
+pub mod aprsis;
+pub mod stream_processor;
 
 
 #[cfg(test)]

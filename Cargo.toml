@@ -1,5 +1,5 @@
 [package]
-name = "APRS-logger-rs"
+name = "aprs-logger-rs"
 version = "0.1.0"
 edition = "2021"
 

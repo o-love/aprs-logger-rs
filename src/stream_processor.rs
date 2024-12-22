@@ -1,6 +1,6 @@
 use std::io::{BufReader, BufRead, Error, Read};
 
-pub type StreamProcessor<T> = Box<dyn Fn(&str) -> Option<T>>;
+pub type StreamProcessor<T> = Box<dyn Fn(&[u8]) -> Option<T>>;
 
 pub struct StreamIterator<R: Read, T> {
     reader: BufReader<R>,
@@ -21,8 +21,8 @@ impl<R: Read, T> Iterator for StreamIterator<R, T> {
     type Item = Result<T, Error>;
     
     fn next(&mut self) -> Option<Self::Item> {
-        let mut line = String::new();
-        match self.reader.read_line(&mut line) {
+        let mut line = vec![];
+        match self.reader.read_until(b'\n', &mut line) {
             Ok(0) => None,  // EOF
             Ok(_) => {
                 // Process the line using our processor function
@@ -39,7 +39,7 @@ impl<R: Read, T> Iterator for StreamIterator<R, T> {
 pub fn process_stream<R, T, F>(input: R, processor: F) -> StreamIterator<R, T>
 where
     R: Read,
-    F: Fn(&str) -> Option<T> + 'static,
+    F: Fn(&[u8]) -> Option<T> + 'static,
 {
     StreamIterator::new(input, Box::new(processor))
 }

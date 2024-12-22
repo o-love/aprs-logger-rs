@@ -1,8 +1,5 @@
-use std::io::Read;
-use std::string::FromUtf8Error;
-use aprs_logger_rs::{aprsis};
-use aprs_logger_rs::aprsis::start_default_aprs_is_stream;
-use aprs_logger_rs::stream_processor::{process_stream, StreamIterator, StreamProcessor};
+use aprs_logger::aprsis::start_default_aprs_is_stream;
+use aprs_logger::stream_processor::{process_stream};
 
 fn main() {
     println!("Hello, world!");

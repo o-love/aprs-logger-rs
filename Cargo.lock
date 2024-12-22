@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "aprs-logger-rs"
+name = "aprs-logger"
 version = "0.1.0"

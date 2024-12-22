@@ -1,6 +1,6 @@
 pub mod aprsis;
 pub mod stream_processor;
-
+mod aprs;
 
 #[cfg(test)]
 mod tests {

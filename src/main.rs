@@ -1,4 +1,6 @@
-use aprs_logger::aprsis::start_default_aprs_is_stream;
+use std::io::Error;
+use aprs_logger::aprsis::cnx::start_default_aprs_is_stream;
+use aprs_logger::aprsis::processor::parse_aprs_tnc2_line;
 use aprs_logger::stream_processor::{process_stream};
 
 fn main() {
@@ -10,8 +12,8 @@ fn main() {
     
 
     let input_processor = |line: &[u8]| {
-        match String::from_utf8(line.to_vec()) {
-            Ok(line) => {Some(line)}
+        match parse_aprs_tnc2_line(line) {
+            Ok(packet) => {Some(packet)}
             Err(err) => {
                 eprint!("Invalid utf-8 line: ");
                 
@@ -25,9 +27,19 @@ fn main() {
         }
     };
 
-    let text_stream = process_stream(tcp_stream, input_processor);
+    let packet_stream = process_stream(tcp_stream, input_processor);
     
-    for line in text_stream {
-        println!("{}", line.unwrap());
+    for result in packet_stream {
+        match result {
+            Ok(packet) => {
+                print!("From: {}; To: {}", packet.origin, packet.destination);
+                for c in packet.payload{
+                    print!("{}", c as char);
+                }
+            }
+            Err(err) => {
+                eprint!("Error while processing packet: {}", err);
+            }
+        }
     }
 }

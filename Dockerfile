@@ -7,5 +7,7 @@ FROM debian:stable-slim AS runtime
 LABEL authors="olove"
 
 COPY --from=builder /usr/local/cargo/bin/aprs-logger /usr/local/bin/aprs-logger
+RUN mkdir /data
+WORKDIR /data
 
 CMD ["aprs-logger"]

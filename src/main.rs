@@ -1,27 +1,28 @@
-use std::io::Error;
+use std::fmt::Debug;
+use std::fs::File;
+use std::io::{BufWriter, Write};
+use chrono::Utc;
 use aprs_logger::aprsis::cnx::start_default_aprs_is_stream;
 use aprs_logger::aprsis::processor::parse_aprs_tnc2_line;
 use aprs_logger::stream_processor::{process_stream};
 
-fn main() {
-    println!("Hello, world!");
-    
+fn aprs_pipeline() {
     let mut tcp_stream = start_default_aprs_is_stream().unwrap();
-    
+
     println!("tcp stream started");
-    
+
 
     let input_processor = |line: &[u8]| {
         match parse_aprs_tnc2_line(line) {
             Ok(packet) => {Some(packet)}
             Err(err) => {
                 eprint!("Invalid utf-8 line: ");
-                
+
                 for c in line {
                     eprint!("{}", *c as char);
                 }
-                eprintln!();
-                
+                eprintln!("{}", err);
+
                 None
             }
         }
@@ -29,12 +30,27 @@ fn main() {
 
     let packet_stream = process_stream(tcp_stream, input_processor);
     
+    let filename = format!("/data/{}", Utc::now().timestamp());
+    let file = File::create(filename).unwrap();
+    let mut writer = BufWriter::new(file);
+
     for result in packet_stream {
         match result {
             Ok(packet) => {
-                print!("From: {}; To: {}", packet.origin, packet.destination);
-                for c in packet.payload{
-                    print!("{}", c as char);
+                let packet_str = format!("{},{},{},{}", packet.recv_time, packet.origin, packet.destination, packet.protocol);
+                
+                match writer.write_all(packet_str.as_bytes()) {
+                    Ok(_) => {}
+                    Err(err) => {
+                        eprint!("Error writing to file: {err}");
+                    }
+                }
+
+                match writer.write_all(packet.payload.as_slice()) {
+                    Ok(_) => {}
+                    Err(err) => {
+                        eprint!("Error writing to file: {err}");
+                    }
                 }
             }
             Err(err) => {
@@ -42,4 +58,14 @@ fn main() {
             }
         }
     }
+}
+
+fn sqlx_pipeline() {
+    
+}
+
+fn main() {
+    println!("Hello, world!");
+    
+    aprs_pipeline()
 }

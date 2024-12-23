@@ -1,10 +1,9 @@
-use std::error;
 use std::string::FromUtf8Error;
-use std::time::Instant;
+use chrono::Utc;
 use crate::aprs::AprsPacket;
 
 pub fn parse_aprs_tnc2_line(line: &[u8]) -> Result<AprsPacket, FromUtf8Error> {
-    let now = Instant::now();
+    let now = Utc::now();
     
     let (origin, remainder) = split_at_char(line, b'>');
     let (destination, remainder) = split_at_char(remainder, b',');

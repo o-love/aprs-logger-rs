@@ -1,6 +1,5 @@
-use std::io::{BufReader, Read, Write};
+use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
-use std::ptr::eq;
 
 pub fn start_aprs_is_stream<A: ToSocketAddrs>(addr: A, call_sign: &str, passwd: &str) -> std::io::Result<TcpStream> {
     let mut aprsis_stream = TcpStream::connect(addr)?;

@@ -28,7 +28,7 @@ fn aprs_pipeline() {
     };
 
     let packet_stream = process_stream(tcp_stream, input_processor);
-    
+
     let filename = format!("/data/{}", Utc::now().timestamp());
     let file = File::create(filename).unwrap();
     let mut writer = BufWriter::new(file);
@@ -36,8 +36,8 @@ fn aprs_pipeline() {
     for result in packet_stream {
         match result {
             Ok(packet) => {
-                let packet_str = format!("{},{},{},{}", packet.recv_time, packet.origin, packet.destination, packet.protocol);
-                
+                let packet_str = format!("\n>>{},{},{},{}", packet.recv_time, packet.origin, packet.destination, packet.protocol);
+
                 match writer.write_all(packet_str.as_bytes()) {
                     Ok(_) => {}
                     Err(err) => {
@@ -61,6 +61,6 @@ fn aprs_pipeline() {
 
 fn main() {
     println!("Hello, world!");
-    
+
     aprs_pipeline()
 }

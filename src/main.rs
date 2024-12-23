@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use chrono::Utc;
@@ -7,7 +6,7 @@ use aprs_logger::aprsis::processor::parse_aprs_tnc2_line;
 use aprs_logger::stream_processor::{process_stream};
 
 fn aprs_pipeline() {
-    let mut tcp_stream = start_default_aprs_is_stream().unwrap();
+    let tcp_stream = start_default_aprs_is_stream().unwrap();
 
     println!("tcp stream started");
 
@@ -58,10 +57,6 @@ fn aprs_pipeline() {
             }
         }
     }
-}
-
-fn sqlx_pipeline() {
-    
 }
 
 fn main() {

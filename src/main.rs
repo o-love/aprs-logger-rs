@@ -29,7 +29,7 @@ fn aprs_pipeline() {
 
     let packet_stream = process_stream(tcp_stream, input_processor);
 
-    let filename = format!("/data/{}", Utc::now().timestamp());
+    let filename = format!("{}", Utc::now().timestamp());
     let file = File::create(filename).unwrap();
     let mut writer = BufWriter::new(file);
 

@@ -1,7 +1,10 @@
 [package]
 name = "aprs-logger"
+description = "Package designed to provide utilities to log data from APRS-IS"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/o-love/aprs-logger-rs"
+license = "Apache-2.0"
 
 [dependencies]
 chrono = "0.4"
